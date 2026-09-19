@@ -12,7 +12,6 @@ main(int argc, char *argv[])
     b = argv[2][0];
   }
 
-  // sanity check
   int result = intsum(a, b);
 
   exit(result);
