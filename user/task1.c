@@ -31,18 +31,23 @@ main(int argc, char *argv[])
 
     if (letter == 'a') {
       int status;
-      int return_pid = wait(&status);
-      printf("variant a, child_pid: %d, exit_code: %d\n", return_pid, status);
-    } else {
+      int ended_child_pid = wait(&status);
+      printf("variant a, child_pid: %d, exit_code: %d\n", ended_child_pid,
+             status);
+    } else if (letter == 'b') {
       int status;
       int kill_code = kill(child_pid);
       if (kill_code != -1) {
-        wait(&status);
-        printf("variant b, child_pid: %d, exit_code: %d\n", child_pid, status);
+        int ended_child_pid = wait(&status);
+        printf("variant b, child_pid: %d, exit_code: %d\n", ended_child_pid,
+               status);
       } else {
         printf("could not kill child proccess\n");
         exit(1);
       }
+    } else {
+      printf("no letters recognised\n");
+      exit(1);
     }
   }
   exit(0);
