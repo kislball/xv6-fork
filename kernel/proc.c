@@ -724,9 +724,8 @@ dump_proc_into_user(pagetable_t pgt, uint64 sz, uint64 us_addr, int lim)
     }
     release(&proc[i].lock);
 
-    if (proccount < lim &&
-        copyout(pgt, sz, us_addr + proccount * sizeof(new), (char *)&new,
-                sizeof(new)) < 0) {
+    if (proccount < lim && copyout(pgt, sz, us_addr + proccount * sizeof(new),
+                                   (char *)&new, sizeof(new)) < 0) {
       release(&wait_lock);
       return -1;
     }

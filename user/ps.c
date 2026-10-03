@@ -49,7 +49,8 @@ main(int argc, char *argv[])
     p = &plist[pc];
     state = "???";
 
-    if (p->state >= 0 && p->state < sizeof(states) / sizeof(states[0]) && states[p->state])
+    if (p->state >= 0 && p->state < sizeof(states) / sizeof(states[0]) &&
+        states[p->state])
       state = states[p->state];
     printf("%d %s %s %d\n", p->pid, state, p->name, p->ppid);
   }
