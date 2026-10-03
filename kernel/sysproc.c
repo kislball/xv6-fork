@@ -120,7 +120,7 @@ sys_listproc(void)
   argaddr(0, &address_raw);
   argint(1, &limit);
 
-  if ((address_raw == 0) || limit < 0) {
+  if (address_raw == 0 || limit <= 0) {
     return -1;
   }
 
