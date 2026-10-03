@@ -18,19 +18,35 @@ main(int argc, char *argv[])
     [ZOMBIE]    = "zombie"
     // clang-format on
   };
-  int lim = NPROC;
-  struct procinfo plist[NPROC];
-  int proccount = listproc(plist, lim);
+  int lim = 2;
+  int proccount;
+  struct procinfo *plist;
+  struct procinfo *p;
   char *state;
 
-  if (proccount < 0) {
-    fprintf(2, "ps: listproc failed\n");
-    exit(1);
+  for (;;) {
+    plist = malloc(sizeof(struct procinfo) * lim);
+    if (plist == 0) {
+      fprintf(2, "ps: out of memory\n");
+      exit(1);
+    }
+
+    proccount = listproc(plist, lim);
+    if (proccount < 0) {
+      free(plist);
+      fprintf(2, "ps: listproc failed\n");
+      exit(1);
+    }
+    if (proccount <= lim)
+      break;
+
+    free(plist);
+    lim = proccount;
   }
 
   printf("PID STATE NAME PPID\n");
   for (int pc = 0; pc < proccount; pc++) {
-    struct procinfo *p = &plist[pc];
+    p = &plist[pc];
     state = "???";
 
     if (p->state >= 0 && p->state < sizeof(states) / sizeof(states[0]) && states[p->state])
@@ -38,5 +54,6 @@ main(int argc, char *argv[])
     printf("%d %s %s %d\n", p->pid, state, p->name, p->ppid);
   }
 
+  free(plist);
   exit(0);
 }

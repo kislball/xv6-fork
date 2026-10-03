@@ -706,7 +706,7 @@ dump_proc_into_user(pagetable_t pgt, uint64 sz, uint64 us_addr, int lim)
   int proccount = 0;
 
   acquire(&wait_lock);
-  for (int i = 0; i < NPROC && proccount < lim; i++) {
+  for (int i = 0; i < NPROC; i++) {
     struct procinfo new;
 
     acquire(&proc[i].lock);
@@ -716,13 +716,16 @@ dump_proc_into_user(pagetable_t pgt, uint64 sz, uint64 us_addr, int lim)
       continue;
     }
 
-    new.pid = proc[i].pid;
-    new.ppid = proc[i].parent == 0 ? 0 : proc[i].parent->pid;
-    safestrcpy(new.name, proc[i].name, sizeof(new.name));
-    new.state = proc[i].state;
+    if (proccount < lim) {
+      new.pid = proc[i].pid;
+      new.ppid = proc[i].parent == 0 ? 0 : proc[i].parent->pid;
+      safestrcpy(new.name, proc[i].name, sizeof(new.name));
+      new.state = proc[i].state;
+    }
     release(&proc[i].lock);
 
-    if (copyout(pgt, sz, us_addr + proccount * sizeof(new), (char *)&new,
+    if (proccount < lim &&
+        copyout(pgt, sz, us_addr + proccount * sizeof(new), (char *)&new,
                 sizeof(new)) < 0) {
       release(&wait_lock);
       return -1;
