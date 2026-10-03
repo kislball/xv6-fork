@@ -699,3 +699,39 @@ procdump(void)
     printk("\n");
   }
 }
+
+int
+dump_proc_into_user(pagetable_t pgt, uint64 sz, uint64 us_addr, int lim)
+{
+  acquire(&pid_lock);
+  acquire(&wait_lock);
+  int proccount = 0;
+  for (int i = 0; i < NPROC; i++) {
+    if (proc[i].state != UNUSED) {
+      proccount++;
+    }
+  }
+
+  for (int i = 0; i < lim; i++) {
+    if (proc[i].state != UNUSED) {
+      // создаем структуру
+      struct procinfo new;
+      new.pid = proc[i].pid;
+      new.ppid = proc[i].parent->pid;
+      safestrcpy(new.name, proc[i].name, 16);
+      new.state = proc[i].state;
+
+      // кладем в массив
+      if (copyout(pgt, sz, us_addr + i * sizeof(struct procinfo), (char *)&new,
+                  sizeof(struct procinfo)) == -1) {
+        release(&pid_lock);
+        release(&wait_lock);
+        return -1;
+      }
+    }
+  }
+  release(&pid_lock);
+  release(&wait_lock);
+
+  return proccount;
+}
