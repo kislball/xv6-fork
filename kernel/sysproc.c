@@ -99,7 +99,7 @@ sys_kill(void)
 }
 
 // return how many clock tick interrupts have occurred
-// since start.
+// since start.gb
 uint64
 sys_uptime(void)
 {
@@ -114,5 +114,19 @@ sys_uptime(void)
 uint64
 sys_listproc(void)
 {
-  return 0;
+  uint64 address_raw;
+  int limit;
+
+  argaddr(0, &address_raw);
+  argint(1, &limit);
+
+  if ((address_raw == 0) || limit < 0) {
+    return -1;
+  }
+
+  struct proc *cur = myproc();
+  pagetable_t pgt = cur->pagetable;
+  uint64 page_size = cur->sz;
+
+  return dump_proc_into_user(pgt, page_size, address_raw, limit);
 }

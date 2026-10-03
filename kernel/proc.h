@@ -106,6 +106,8 @@ struct proc {
 struct procinfo {
   int pid;
   char name[16];
-  struct procinfo *parent;
+  int ppid;
   enum procstate state;
 };
+
+int dump_proc_into_user(pagetable_t pgt, uint64 sz, uint64 us_addr, int lim);
