@@ -711,7 +711,7 @@ dump_proc_into_user(pagetable_t pgt, uint64 sz, uint64 us_addr, int lim)
 
     acquire(&proc[i].lock);
     if (proc[i].state != SLEEPING && proc[i].state != RUNNABLE &&
-        proc[i].state != RUNNING) {
+        proc[i].state != RUNNING && proc[i].state != ZOMBIE) {
       release(&proc[i].lock);
       continue;
     }
