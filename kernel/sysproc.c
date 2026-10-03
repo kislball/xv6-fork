@@ -7,6 +7,9 @@
 #include "proc.h"
 #include "vm.h"
 
+extern struct proc proc[NPROC];
+extern struct spinlock wait_lock;
+
 uint64
 sys_exit(void)
 {
@@ -109,6 +112,42 @@ sys_uptime(void)
   xticks = ticks;
   release(&tickslock);
   return xticks;
+}
+
+int
+dump_proc_into_user(pagetable_t pgt, uint64 sz, uint64 us_addr, int lim)
+{
+  int proccount = 0;
+
+  acquire(&wait_lock);
+  for (int i = 0; i < NPROC; i++) {
+    struct procinfo cur_info;
+
+    acquire(&proc[i].lock);
+    if (proc[i].state != SLEEPING && proc[i].state != RUNNABLE &&
+        proc[i].state != RUNNING && proc[i].state != ZOMBIE) {
+      release(&proc[i].lock);
+      continue;
+    }
+
+    if (proccount < lim) {
+      cur_info.pid = proc[i].pid;
+      cur_info.ppid = proc[i].parent == 0 ? 0 : proc[i].parent->pid;
+      safestrcpy(cur_info.name, proc[i].name, sizeof(cur_info.name));
+      cur_info.state = proc[i].state;
+    }
+    release(&proc[i].lock);
+
+    if (proccount < lim && copyout(pgt, sz, us_addr + proccount * sizeof(cur_info),
+                                   (char *)&cur_info, sizeof(cur_info)) < 0) {
+      release(&wait_lock);
+      return -1;
+    }
+    proccount++;
+  }
+  release(&wait_lock);
+
+  return proccount;
 }
 
 uint64

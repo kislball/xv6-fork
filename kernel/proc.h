@@ -102,5 +102,3 @@ struct proc {
   struct inode *cwd;           // Current directory
   char name[16];               // Process name (debugging)
 };
-
-int dump_proc_into_user(pagetable_t pgt, uint64 sz, uint64 us_addr, int lim);
