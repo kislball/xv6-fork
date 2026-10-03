@@ -707,13 +707,13 @@ dump_proc_into_user(pagetable_t pgt, uint64 sz, uint64 us_addr, int lim)
   acquire(&wait_lock);
   int proccount = 0;
   for (int i = 0; i < NPROC; i++) {
-    if (proc[i].state != UNUSED) {
+    if ((proc[i].state != UNUSED) && (proc[i].state != USED)) {
       proccount++;
     }
   }
 
   for (int i = 0; i < lim; i++) {
-    if (proc[i].state != UNUSED) {
+    if ((proc[i].state != UNUSED) && (proc[i].state != USED)) {
       // создаем структуру
       struct procinfo new;
       new.pid = proc[i].pid;
