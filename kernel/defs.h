@@ -184,3 +184,15 @@ void            virtio_disk_intr(void);
 
 // number of elements in fixed-size array
 #define NELEM(x) (sizeof(x) / sizeof((x)[0]))
+
+// mutex.c
+struct mutex;
+int
+mutexalloc(struct file **f);
+void
+mutexclose(struct mutex *mux);
+int
+mutexrelease(struct mutex *mux);
+void
+mutexlock(struct mutex *mux);
+
