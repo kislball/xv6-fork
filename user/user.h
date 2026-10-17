@@ -26,6 +26,11 @@ int pause(int);
 int uptime(void);
 int sync(void);
 
+// mutex.c
+int mutex(void);
+int mutexlock(int fd);
+int mutexunlock(int fd);
+
 // ulib.c
 int stat(const char *, struct stat *);
 char *strcpy(char *, const char *);
