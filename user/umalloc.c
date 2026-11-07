@@ -188,7 +188,7 @@ reclaim(void)
 static void *
 mallocsmall(uint nbytes)
 {
-  uint size = (nbytes + sizeof(Header) + MINBLOCK - 1);
+  uint size = (nbytes + sizeof(Header) + MINBLOCK - 1) / MINBLOCK * MINBLOCK;
   Header *p = 0;
   for (uint bin = blockbin(size); bin < NBINS; bin++) {
     for (p = bins[bin]; p; p = p->s.ptr)
@@ -203,13 +203,13 @@ mallocsmall(uint nbytes)
     p = (Header *)(slabs + 1);
   }
   removeblock(p);
-  if (p->s.size > size) {
+  if (p->s.size - size >= sizeof(Header) + 1) {
     Header *rest = (Header *)((char *)p + size);
     rest->s.size = p->s.size - size;
     rest->s.slab = p->s.slab;
     push(rest);
+    p->s.size = size;
   }
-  p->s.size = size;
   p->s.requested = nbytes;
   p->s.slab->live++;
   return p + 1;
