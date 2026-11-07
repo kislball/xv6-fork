@@ -6,11 +6,11 @@
 // Memory allocator by Kernighan and Ritchie,
 // The C programming Language, 2nd ed.  Section 8.7.
 
-#define NBINS 8
-#define MINBLOCK 64
-#define MAXSMALL 4096
+#define NBINS        8
+#define MINBLOCK     64
+#define MAXSMALL     4096
 #define MAXBLOCKSIZE (MINBLOCK << (NBINS - 1))
-#define FREE (~0U)
+#define FREE         (~0U)
 
 struct slab;
 typedef long Align;
@@ -166,8 +166,7 @@ reclaim(void)
 {
   for (;;) {
     struct slab *s = slabs;
-    if (s == 0 || s->live != 0 ||
-        (char *)s + s->bytes != sbrk(0))
+    if (s == 0 || s->live != 0 || (char *)s + s->bytes != sbrk(0))
       return;
     char *end = (char *)(s + 1) + MAXBLOCKSIZE;
     for (Header *p = (Header *)(s + 1); (char *)p < end;
@@ -247,16 +246,16 @@ dumpheap(void)
   }
   for (Header *p = livebig; p; p = p->s.ptr)
     used += p->s.requested;
-  fprintf(2, "heap: brk=%p used=%lu reserved=%lu utilization=%lu%%\n",
-          sbrk(0), used, reserved, reserved ? used * 100 / reserved : 0);
+  fprintf(2, "heap: brk=%p used=%lu reserved=%lu utilization=%lu%%\n", sbrk(0),
+          used, reserved, reserved ? used * 100 / reserved : 0);
   for (struct slab *s = slabs; s; s = s->next) {
-    fprintf(2, " slab=%p bytes=%u live=%u next=%p\n",
-            s, s->bytes, s->live, s->next);
+    fprintf(2, " slab=%p bytes=%u live=%u next=%p\n", s, s->bytes, s->live,
+            s->next);
     char *end = (char *)(s + 1) + MAXBLOCKSIZE;
     for (Header *p = (Header *)(s + 1); (char *)p < end;
          p = (Header *)((char *)p + p->s.size))
-      fprintf(2, "  small=%p capacity=%lu %s requested=%u\n",
-              p + 1, p->s.size - sizeof(Header),
+      fprintf(2, "  small=%p capacity=%lu %s requested=%u\n", p + 1,
+              p->s.size - sizeof(Header),
               p->s.requested == FREE ? "free" : "used",
               p->s.requested == FREE ? 0 : p->s.requested);
   }
@@ -268,14 +267,14 @@ dumpheap(void)
     fprintf(2, "\n");
   }
   for (Header *p = livebig; p; p = p->s.ptr)
-    fprintf(2, " large=%p bytes=%lu used requested=%u\n",
-            p + 1, p->s.size * sizeof(Header), p->s.requested);
+    fprintf(2, " large=%p bytes=%lu used requested=%u\n", p + 1,
+            p->s.size * sizeof(Header), p->s.requested);
   if (freep) {
     Header *p = freep;
     do {
       if (p != &base)
-        fprintf(2, " large=%p bytes=%lu free next=%p\n",
-                p + 1, p->s.size * sizeof(Header), p->s.ptr);
+        fprintf(2, " large=%p bytes=%lu free next=%p\n", p + 1,
+                p->s.size * sizeof(Header), p->s.ptr);
       p = p->s.ptr;
     } while (p != freep);
   }
@@ -288,7 +287,8 @@ malloc(uint nbytes)
 {
   if (nbytes > 0x7fffffffU - 2 * sizeof(Header))
     return 0;
-  void *p = nbytes > MAXSMALL || ALWAYS_BIG ? mallocbig(nbytes) : mallocsmall(nbytes);
+  void *p =
+    nbytes > MAXSMALL || ALWAYS_BIG ? mallocbig(nbytes) : mallocsmall(nbytes);
   if (p)
     dumpheap();
   return p;
