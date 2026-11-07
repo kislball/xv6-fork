@@ -189,7 +189,7 @@ reclaim(void)
 static void *
 mallocsmall(uint nbytes)
 {
-  uint size = (nbytes + sizeof(Header) + MINBLOCK - 1):
+  uint size = (nbytes + sizeof(Header) + MINBLOCK - 1);
   Header *p = 0;
   for (uint bin = blockbin(size); bin < NBINS; bin++) {
     for (p = bins[bin]; p; p = p->s.ptr)
@@ -236,6 +236,7 @@ freesmall(Header *p)
 static void
 dumpheap(void)
 {
+  pages();
   uint64 used = 0;
   for (struct slab *s = slabs; s; s = s->next) {
     char *end = (char *)(s + 1) + MAXBLOCKSIZE;
@@ -280,12 +281,14 @@ dumpheap(void)
   }
 }
 
+#define ALWAYS_BIG 0
+
 void *
 malloc(uint nbytes)
 {
   if (nbytes > 0x7fffffffU - 2 * sizeof(Header))
     return 0;
-  void *p = nbytes > MAXSMALL ? mallocbig(nbytes) : mallocsmall(nbytes);
+  void *p = nbytes > MAXSMALL || ALWAYS_BIG ? mallocbig(nbytes) : mallocsmall(nbytes);
   if (p)
     dumpheap();
   return p;
@@ -297,7 +300,7 @@ free(void *ap)
   if (ap == 0)
     return;
   Header *p = (Header *)ap - 1;
-  if (p->s.slab) {
+  if (p->s.slab && !ALWAYS_BIG) {
     freesmall(p);
   } else {
     Header **link = &livebig;
