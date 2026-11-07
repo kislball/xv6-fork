@@ -11,7 +11,8 @@
 #include "fcntl.h"
 
 void
-print_pte_flags(pte_t pte) {
+print_pte_flags(pte_t pte)
+{
   printk((pte & PTE_R) ? "R" : "_");
   printk((pte & PTE_W) ? "W" : "_");
   printk((pte & PTE_X) ? "X" : "_");
@@ -28,7 +29,8 @@ print_pgtbl_level(pagetable_t pagetable, int level)
     pte_t pte = pagetable[i];
     if (pte & PTE_V) {
       uint64 child_pa = PTE2PA(pte);
-      for(int j = 0; j < (2 - level); j++) printk(".........");
+      for (int j = 0; j < (2 - level); j++)
+        printk(".........");
       printk("0x%x -> 0x%lx ", i, child_pa);
       print_pte_flags(pte);
       printk("\n");
@@ -38,7 +40,6 @@ print_pgtbl_level(pagetable_t pagetable, int level)
     }
   }
 }
-
 
 uint64
 sys_pages(void)
