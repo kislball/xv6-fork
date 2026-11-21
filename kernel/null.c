@@ -65,8 +65,20 @@ zerowrite(int user_src, uint64 src, int n)
   return -1;
 }
 
+int
+nulldevread(int user_dst, uint64 dst, int n)
+{
+  return 0;
+}
+
+int
+nulldevwrite(int user_src, uint64 src, int n)
+{
+  return n;
+}
+
 struct nullfilehandler handlers[NULLDEVICE_TOTAL] = {
-    [NULLDEVICE_NULL] = {},
+    [NULLDEVICE_NULL] = {nulldevread, nulldevwrite},
     [NULLDEVICE_ZERO] = {zeroread, zerowrite},
     [NULLDEVICE_NULLSTAT] = {
         .read = nullstat_read,
