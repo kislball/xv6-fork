@@ -6,6 +6,8 @@ int
 main(int argc, char **argv)
 {
   static const char digits[] = "0123456789ABCDEF";
+  if (argc < 3)
+    return 1;
   int count = atoi(argv[1]);
   int fd = open(argv[2], O_RDONLY);
   uchar *buf = (uchar *)sbrk(count);
