@@ -35,6 +35,10 @@ main(void)
     mknod("nullstat", NULLDEVICES, NULLDEVICE_NULLSTAT);
   }
 
+  if (open("rtc", O_RDONLY) < 0) {
+    mknod("rtc", RTC_DEVICE, 0);
+  }
+
   for (;;) {
     printf("init: starting sh\n");
     pid = fork();
