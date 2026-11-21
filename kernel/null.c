@@ -1,6 +1,5 @@
-#include "defs.h"
-#include "file.h"
-#include "fs.h"
+#include "types.h"
+#include "spinlock.h"
 #include "sleeplock.h"
 #include "fs.h"
 #include "file.h"
