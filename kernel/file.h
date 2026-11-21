@@ -7,6 +7,7 @@ struct file {
   struct inode *ip;  // FD_INODE and FD_DEVICE
   uint off;          // FD_INODE
   short major;       // FD_DEVICE
+  short minor;       // FD_MINOR
 };
 
 #define major(dev)  ((dev) >> 16 & 0xFFFF)
@@ -31,8 +32,8 @@ struct inode {
 
 // map major device number to device functions.
 struct devsw {
-  int (*read)(int, uint64, int);
-  int (*write)(int, uint64, int);
+  int (*read)(int, uint64, int, short);
+  int (*write)(int, uint64, int, short);
 };
 
 extern struct devsw devsw[];
