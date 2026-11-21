@@ -12,6 +12,38 @@ struct nullfilehandler {
   int (*write)(int, uint64, int);
 };
 
+struct {
+    struct spinlock lock;
+    uint64 total;
+} nullstat;
+
+void
+nullstat_init()
+{
+    nullstat.total = 0;
+    initlock(&nullstat.lock, "nullstat");
+}
+
+int
+nullstat_write(int user_src, uint64 src, int n)
+{
+    acquire(&nullstat.lock);
+    nullstat.total += n;
+    release(&nullstat.lock);
+    return n;
+}
+
+int
+nullstat_read(int user_dst, uint64 dst, int n)
+{
+    if (n != sizeof(uint64)) return -1;
+
+    acquire(&nullstat.lock);
+    int res = either_copyout(user_dst, dst, &nullstat.total, sizeof(nullstat.total));
+    release(&nullstat.lock);
+    return res == -1 ? -1 : sizeof(nullstat.total);
+}
+
 int
 zeroread(int user_dst, uint64 dst, int n)
 {
@@ -37,7 +69,10 @@ zerowrite(int user_src, uint64 src, int n)
 struct nullfilehandler handlers[NULLDEVICE_TOTAL] = {
     [NULLDEVICE_NULL] = {},
     [NULLDEVICE_ZERO] = {zeroread, zerowrite},
-    [NULLDEVICE_NULLSTAT] = {}
+    [NULLDEVICE_NULLSTAT] = {
+        .read = nullstat_read,
+        .write = nullstat_write
+    }
 };
 
 int
@@ -58,6 +93,5 @@ nullinit(void)
     nullstat_init();
 
     devsw[NULLDEVICES].write = nullwrite;
-    devsw[NULLDEVICES].read = nullread;
     devsw[NULLDEVICES].read = nullread;
 }
