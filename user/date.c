@@ -23,7 +23,7 @@ hex_val(char c)
 }
 
 int
-read_hex_from_stdin(uint64 *out_ns)
+read_hex_from_stdin(int64 *out_ns)
 {
   char buf[BUF_SIZE];
   int total = 0;
@@ -35,7 +35,7 @@ read_hex_from_stdin(uint64 *out_ns)
   }
   buf[total] = '\0';
 
-  uint64 ns = 0;
+  int64 ns = 0;
   int byte_idx = 0;
   int i = 0;
 
@@ -66,7 +66,7 @@ read_hex_from_stdin(uint64 *out_ns)
 }
 
 void
-print_padded(uint64 val, int width)
+print_padded(int64 val, int width)
 {
   char out[OUT_SIZE];
   for (int i = width - 1; i >= 0; i--) {
@@ -77,26 +77,41 @@ print_padded(uint64 val, int width)
 }
 
 void
-print_datetime(uint64 ns)
+print_datetime(int64 ns)
 {
-  uint64 total_sec = ns / 1000000000ULL;
-  uint64 rem_ns = ns % 1000000000ULL;
+  int64 total_sec = ns / 1000000000LL;
+  int64 rem_ns = ns % 1000000000LL;
+  if (rem_ns < 0) {
+    rem_ns += 1000000000LL;
+    total_sec -= 1;
+  }
 
-  uint64 days = total_sec / 86400;
-  uint64 seconds_of_day = total_sec % 86400;
+  int64 days = total_sec / 86400;
+  int64 seconds_of_day = total_sec % 86400;
+  if (seconds_of_day < 0) {
+    seconds_of_day += 86400;
+    days -= 1;
+  }
 
   int hour = seconds_of_day / 3600;
   int min = (seconds_of_day % 3600) / 60;
   int sec = seconds_of_day % 60;
 
   int year = 1970;
-  while (1) {
-    int days_in_year = is_leap(year) ? 366 : 365;
-    if (days >= days_in_year) {
-      days -= days_in_year;
-      year++;
-    } else {
-      break;
+  if (days >= 0) {
+    while (1) {
+      int days_in_year = is_leap(year) ? 366 : 365;
+      if (days >= days_in_year) {
+        days -= days_in_year;
+        year++;
+      } else {
+        break;
+      }
+    }
+  } else {
+    while (days < 0) {
+      year--;
+      days += is_leap(year) ? 366 : 365;
     }
   }
 
@@ -136,7 +151,7 @@ print_datetime(uint64 ns)
 int
 main(int argc, char *argv[])
 {
-  uint64 ns = 0;
+  int64 ns = 0;
 
   if (read_hex_from_stdin(&ns) < 0) {
     fprintf(2, "date: invalid input\n");
