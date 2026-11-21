@@ -87,12 +87,16 @@ struct nullfilehandler handlers[NULLDEVICE_TOTAL] = {
 int
 nullwrite(int user_src, uint64 src, int n, short minor)
 {
+  if (minor < 0 || minor >= NULLDEVICE_TOTAL)
+    return -1;
   return handlers[minor].write(user_src, src, n);
 }
 
 int
 nullread(int user_dst, uint64 dst, int n, short minor)
 {
+  if (minor < 0 || minor >= NULLDEVICE_TOTAL)
+    return -1;
   return handlers[minor].read(user_dst, dst, n);
 }
 
