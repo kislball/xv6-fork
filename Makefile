@@ -153,6 +153,7 @@ UPROGS=\
 	$U/_dorphan\
 	$U/_sync\
 	$U/_hexdump\
+	$U/_date\
 
 fs.img: mkfs/mkfs README $(UPROGS)
 	mkfs/mkfs fs.img README $(UPROGS)
