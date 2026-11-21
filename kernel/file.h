@@ -40,3 +40,13 @@ extern struct devsw devsw[];
 
 #define CONSOLE 1
 #define NULLDEVICES 2
+
+enum nulldevice_kind_t {
+    NULLDEVICE_NULL,
+    NULLDEVICE_ZERO,
+    NULLDEVICE_NULLSTAT,
+    
+    // add new types here, if needed
+
+    NULLDEVICE_TOTAL
+};

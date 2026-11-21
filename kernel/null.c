@@ -2,18 +2,10 @@
 #include "file.h"
 #include "fs.h"
 #include "sleeplock.h"
-#include "spinlock.h"
-#include "types.h"
-
-enum nulldevice_kind_t {
-    NULLDEVICE_NULL,
-    NULLDEVICE_ZERO,
-    NULLDEVICE_NULLSTAT,
-
-    // add new types here, if needed
-
-    NULLDEVICE_TOTAL
-};
+#include "fs.h"
+#include "file.h"
+#include "riscv.h"
+#include "defs.h"
 
 struct nullfilehandler {
   int (*read)(int, uint64, int);
@@ -63,6 +55,9 @@ nullread(int user_dst, uint64 dst, int n, short minor)
 void
 nullinit(void)
 {
+    nullstat_init();
+
     devsw[NULLDEVICES].write = nullwrite;
+    devsw[NULLDEVICES].read = nullread;
     devsw[NULLDEVICES].read = nullread;
 }
