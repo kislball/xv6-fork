@@ -12,6 +12,8 @@ main()
 {
   if (cpuid() == 0) {
     consoleinit();
+    nullinit();
+    inittime();
     printkinit();
     printk("\n");
     printk("xv6 kernel is booting\n");

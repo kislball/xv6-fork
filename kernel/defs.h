@@ -18,10 +18,17 @@ void            bwrite(struct buf*);
 void            bpin(struct buf*);
 void            bunpin(struct buf*);
 
+// rtc.c
+void            inittime(void);
+uint64          readtime(void);
+
 // console.c
 void            consoleinit(void);
 void            consoleintr(int);
 void            consputc(int);
+
+// null.c
+void            nullinit(void);
 
 // exec.c
 int             kexec(char*, char**);
