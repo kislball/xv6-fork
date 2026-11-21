@@ -28,7 +28,7 @@ kvmmake(void)
 
   // uart registers
   kvmmap(kpgtbl, UART0, UART0, PGSIZE, PTE_R | PTE_W);
-  
+
   // RTC registers
   kvmmap(kpgtbl, RTC_BASE, RTC_BASE, PGSIZE, PTE_R);
 
